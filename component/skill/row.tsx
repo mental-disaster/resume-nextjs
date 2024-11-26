@@ -1,8 +1,8 @@
 import { Badge, Col, Row } from 'reactstrap';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 import { ISkill } from './ISkill';
-import { Style } from '../common/Style';
 import Util from '../common/Util';
 
 export default function SkillRow({
@@ -26,10 +26,7 @@ export default function SkillRow({
     <div>
       {index > 0 ? <hr /> : ''}
       <Row>
-        <Col sm={12} md={3} className="text-md-right">
-          <h4 style={Style.gray}>{skill.category}</h4>
-        </Col>
-        <Col sm={12} md={9}>
+        <Col>
           {/* {skill.items.map((item) => JSON.stringify(item, null, 2))} */}
           {createCalculatedSkillItems(skill.items, isMobileScreen)}{' '}
           {/* isVerticalScreen을 인자로 전달 */}
@@ -45,44 +42,25 @@ function createCalculatedSkillItems(items: ISkill.Item[], isVerticalScreen: bool
   /**
    * @developer_commentary 단을 3단, 4단을 시도해봤지만 생각보다 이쁘게 나오지 않았고, 우선은 3단으로 한다. 만약 이쪽을 발전시킨다면 조금 더 이쁘고 능동적이게 데이터를 쪼갤 수 있는 방법을 찾으면 될 듯..
    */
-  const layer = 3;
+  const layer = isVerticalScreen ? 2 : 3; 
 
-  // const splitPoint = layer % 2 ? Math.ceil(items.length / layer) : Math.floor(items.length / layer);
-  const splitPoint = Math.ceil(items.length / layer);
+  const list: ISkill.Item[][] = Array.from({ length: layer }, () => []);
 
-  const list: ISkill.Item[][] = [];
+  items.forEach((item, index) => {
+    list[index % layer].push(item);
+  });
 
-  for (let i = 0, splitAfter = splitPoint; i < layer; i += 1, splitAfter += splitPoint) {
-    list.push(items.slice(splitAfter - splitPoint, i === layer - 1 ? undefined : splitAfter));
-  }
-
-  log('origin', items, items.length, splitPoint);
+  log('origin', items, items.length);
   log('list', list);
 
-  if (isVerticalScreen) {
-    return (
-      <Row className="mt-2 mt-md-0">
-        <Col xs={12}>
-          <ul>
-            {items.map((skill, skillIndex) => {
-              return (
-                <li key={skillIndex.toString()}>
-                  {createBadge(skill.level)}
-                  {skill.title}
-                </li>
-              );
-            })}
-          </ul>
-        </Col>
-      </Row>
-    );
-  }
-
   return (
-    <Row className="mt-2 mt-md-0">
+    <Row className={clsx(
+      "mt-2 mt-md-0",
+      isVerticalScreen ? 'pl-1' : 'pl-5'
+    )}>
       {list.map((skills, index) => {
         return (
-          <Col md={4} xs={12} key={index.toString()}>
+          <Col md={4} xs={6} key={index.toString()}>
             <ul>
               {skills.map((skill, skillIndex) => {
                 return (

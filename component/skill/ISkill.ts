@@ -23,7 +23,7 @@ export declare namespace ISkill {
 
   export interface Skill {
     /** ### 대분류 */
-    category: string;
+    // category: string;
 
     /** ### 해당 분류 내 항목들 */
     items: Item[];
